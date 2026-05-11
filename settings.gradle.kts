@@ -16,7 +16,9 @@ plugins {
 }
 
 rootProject.name = "Sunscreen"
-include("api")
-include("spigot")
-include("minestom")
-include("common")
+include(
+    "api",
+    "spigot",
+    "minestom",
+    "common"
+)

@@ -3,9 +3,11 @@ import org.gradle.accessors.dm.LibrariesForLibs
 
 plugins {
     id("java")
-    id("com.gradleup.shadow") version "9.2.2"
-    id("xyz.jpenilla.run-paper") version "2.3.1"
-    id("de.eldoria.plugin-yml.paper") version "0.7.1"
+    id("sunscreen-main")
+
+    alias(libs.plugins.shadow)
+    alias(libs.plugins.run.paper)
+    alias(libs.plugins.pluginyml)
 }
 
 repositories {
@@ -19,6 +21,15 @@ repositories {
     maven("https://repo.extendedclip.com/releases/")
     maven("https://repo.aikar.co/content/groups/aikar/")
     maven("https://repo.nexomc.com/releases")
+}
+
+dependencies {
+    implementation(project(":common"))
+    implementation(libs.packetevents)
+    implementation(libs.lamp.paper)
+    implementation(libs.lamp.brigadier)
+    compileOnly(libs.paper)
+    library(libs.bundles.utils)
 }
 
 configurations.all {
@@ -45,45 +56,33 @@ tasks {
     shadowJar {
         archiveBaseName.set("Sunscreen")
         archiveClassifier.set(null)
-        archiveVersion.set(this.project.version.toString())
+        archiveVersion.set(project.version.toString())
         configurations = listOf(project.configurations.runtimeClasspath.get())
+
         dependencies {
-            exclude(dependency("com.google.guava:guava:31.1-jre"))
-            exclude(dependency("org.apache.commons:commons-lang3:3.17.0"))
-            exclude(dependency("commons-io:commons-io:2.18.0"))
-            exclude(dependency("com.github.ben-manes.caffeine:caffeine:3.2.0"))
-            exclude(dependency("org.jetbrains.kotlin:kotlin-reflect:1.7.22"))
-            exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.22"))
+            exclude(dependency("com.google.guava:guava"))
+            exclude(dependency("org.apache.commons:commons-lang3"))
+            exclude(dependency("commons-io:commons-io"))
+            exclude(dependency("com.github.ben-manes.caffeine:caffeine"))
+            exclude(dependency("org.jetbrains.kotlin:kotlin-reflect"))
+            exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk8"))
         }
+
         relocate("com.github.retrooper.packetevents", "me.combimagnetron.shaded.packetevents.api")
         relocate("io.github.retrooper.packetevents", "me.combimagnetron.shaded.packetevents.impl")
     }
-}
 
-tasks.withType(xyz.jpenilla.runtask.task.AbstractRun::class) {
-    javaLauncher = javaToolchains.launcherFor {
-        vendor = JvmVendorSpec.AZUL
-        languageVersion = JavaLanguageVersion.of(25)
+    withType(xyz.jpenilla.runtask.task.AbstractRun::class) {
+        javaLauncher = project.javaToolchains.launcherFor {
+            vendor = JvmVendorSpec.AZUL
+            languageVersion = JavaLanguageVersion.of(25)
+        }
+        //jvmArgs("-XX:+AllowEnhancedClassRedefinition")
     }
-    //jvmArgs("-XX:+AllowEnhancedClassRedefinition")
-}
 
-tasks.withType<JavaCompile> {
-    options.compilerArgs.add("-parameters")
-}
-
-fun libs(): LibrariesForLibs {
-    return rootProject.libs
-}
-
-dependencies {
-    implementation(project(":api"))
-    implementation(project(":common"))
-    implementation(libs().packetevents)
-    implementation(libs().lamp.paper)
-    implementation(libs().lamp.brigadier)
-    compileOnly(libs().paper)
-    library(libs().bundles.utils)
+    withType<JavaCompile> {
+        options.compilerArgs.add("-parameters")
+    }
 }
 
 paper {

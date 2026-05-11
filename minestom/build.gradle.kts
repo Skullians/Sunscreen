@@ -1,21 +1,21 @@
+plugins {
+    application
+    id("sunscreen-main")
+    id("sunscreen-publish")
+}
+
 dependencies {
-    implementation(project(":api"))
     implementation(project(":common"))
-    implementation("ch.qos.logback:logback-classic:1.5.29")
-    implementation("net.minestom:minestom:2026.02.09-1.21.11")
-    compileOnly("commons-io:commons-io:2.18.0")
-    implementation("com.google.code.gson:gson:2.13.2")
+
+    implementation(libs.bundles.utils)
+    implementation(libs.logback.classic)
+    implementation(libs.minestom)
 }
 
 configurations.all {
     resolutionStrategy {
         cacheChangingModulesFor(0, "seconds")
     }
-}
-
-plugins {
-    application
-    id("sunscreen-publish")
 }
 
 application {

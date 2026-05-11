@@ -1,5 +1,6 @@
 plugins {
     java
+    id("sunscreen-main")
     id("sunscreen-publish")
 }
 
